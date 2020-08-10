@@ -16,12 +16,10 @@ import shouldComponentUpdate from './updater';
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import {SELECT_DATE_SLOT} from '../testIDs';
 
-//Fallback for react-native-web or when RN version is < 0.44
+
+//Fallback when RN version is < 0.44
 const {View, ViewPropTypes} = ReactNative;
-const viewPropTypes =
-  typeof document !== 'undefined'
-    ? PropTypes.shape({style: PropTypes.object})
-    : ViewPropTypes || View.propTypes;
+const viewPropTypes = ViewPropTypes || View.propTypes;
 const EmptyArray = [];
 
 /**
@@ -362,13 +360,17 @@ class Calendar extends Component {
         indicator = true;
       }
     }
-
+    const containerStyle = {
+      paddingRight: 0,
+      paddingLeft: 0,
+      paddingTop: 0,
+    }
     return (
       <GestureRecognizer
         onSwipe={(direction, state) => this.onSwipe(direction, state)}
       >
         <View
-          style={[this.style.container, this.props.style]}
+          style={[this.style.container, this.props.style, containerStyle]}
           accessibilityElementsHidden={this.props.accessibilityElementsHidden} // iOS
           importantForAccessibility={this.props.importantForAccessibility} // Android
         >
