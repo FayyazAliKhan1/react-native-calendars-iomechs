@@ -7,7 +7,7 @@ import styleConstructor from './style';
 import {weekDayNames} from '../../dateutils';
 import {CHANGE_MONTH_LEFT_ARROW, CHANGE_MONTH_RIGHT_ARROW, HEADER_MONTH_NAME} from '../../testIDs';
 import _ from 'lodash';
-
+import appColors from '../../../../../src/styles/colors';
 
 class CalendarHeader extends Component {
   static displayName = 'IGNORE';
@@ -192,7 +192,7 @@ class CalendarHeader extends Component {
     return (
       <View
         testID={testID}
-        style={this.props.style}
+        style={[this.props.style]}
         accessible
         accessibilityRole={'adjustable'}
         accessibilityActions={[
@@ -203,7 +203,7 @@ class CalendarHeader extends Component {
         accessibilityElementsHidden={this.props.accessibilityElementsHidden} // iOS
         importantForAccessibility={this.props.importantForAccessibility} // Android
       >
-        <View style={this.style.header}>
+        <View style={[this.style.header, { backgroundColor: appColors.primary, marginTop: 0 }]}>
           {leftArrow}
           <View style={this.style.headerContainer}>
             {this.renderHeader()}
