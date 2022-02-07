@@ -237,7 +237,8 @@ class CalendarHeader extends Component {
             {this.renderHeader()}
             {indicator}
           </View>
-          <View style={{flexDirection: 'row', position: 'absolute', right: 0}}>
+          <View
+            style={{flexDirection: 'row', position: 'absolute', right: -30}}>
             {leftArrow}
             {rightArrow}
           </View>
