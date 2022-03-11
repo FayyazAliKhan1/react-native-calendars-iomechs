@@ -161,7 +161,6 @@ class CalendarHeader extends Component {
           onPress={this.onPressLeft}
           disabled={this.props.disableArrowLeft}
           style={[this.style.arrow, {marginRight: 20}]}
-          hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
           testID={
             testID
               ? `${CHANGE_MONTH_LEFT_ARROW}-${testID}`
@@ -186,7 +185,6 @@ class CalendarHeader extends Component {
           onPress={this.onPressRight}
           disabled={this.props.disableArrowRight}
           style={this.style.arrow}
-          hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
           testID={
             testID
               ? `${CHANGE_MONTH_RIGHT_ARROW}-${testID}`
