@@ -160,7 +160,8 @@ class CalendarHeader extends Component {
         <TouchableOpacity
           onPress={this.onPressLeft}
           disabled={this.props.disableArrowLeft}
-          style={[this.style.arrow, {marginRight: 20}]}
+          style={[this.style.arrow, {marginRight: 10}]}
+          hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
           testID={
             testID
               ? `${CHANGE_MONTH_LEFT_ARROW}-${testID}`
@@ -185,6 +186,7 @@ class CalendarHeader extends Component {
           onPress={this.onPressRight}
           disabled={this.props.disableArrowRight}
           style={this.style.arrow}
+          hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
           testID={
             testID
               ? `${CHANGE_MONTH_RIGHT_ARROW}-${testID}`
@@ -230,13 +232,15 @@ class CalendarHeader extends Component {
         importantForAccessibility={this.props.importantForAccessibility} // Android
       >
         <View
-          style={[this.style.header, {backgroundColor: 'white', marginTop: 0}]}>
+          style={[
+            this.style.header,
+            {backgroundColor: '#132141', marginTop: 0},
+          ]}>
           <View style={this.style.headerContainer}>
             {this.renderHeader()}
             {indicator}
           </View>
-          <View
-            style={{flexDirection: 'row', position: 'absolute', right: -30}}>
+          <View style={{flexDirection: 'row'}}>
             {leftArrow}
             {rightArrow}
           </View>
