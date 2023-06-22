@@ -15,6 +15,7 @@ class Day extends Component {
     state: PropTypes.oneOf(['selected', 'disabled', 'today', '']),
     // Specify theme properties to override specific styles for calendar parts. Default = {}
     theme: PropTypes.object,
+    fillerGapsColor: PropTypes.string,
     marking: PropTypes.any,
     onPress: PropTypes.func,
     onLongPress: PropTypes.func,
@@ -27,7 +28,7 @@ class Day extends Component {
 
     this.theme = {...defaultStyle, ...(props.theme || {})};
     this.style = styleConstructor(props.theme);
-
+    this.fillerGapsColor = props.fillerGapsColor;
     this.markingStyle = this.getDrawingStyle(props.marking || []);
     this.onDayPress = this.onDayPress.bind(this);
     this.onDayLongPress = this.onDayLongPress.bind(this);
@@ -193,8 +194,8 @@ class Day extends Component {
 
       const customStyles = {
         dayStyles: {
-          backgroundColor: '#FBEDED',
-          width: 20,
+          backgroundColor: this.fillerGapsColor,
+          width: 22,
           height: 34,
           position: 'absolute',
         },
@@ -218,6 +219,7 @@ class Day extends Component {
     const {
       marking: {marked, dotColor},
       theme,
+      fillerGapsColor,
     } = this.props;
 
     return (

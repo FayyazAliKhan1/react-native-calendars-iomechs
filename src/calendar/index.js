@@ -16,7 +16,6 @@ import shouldComponentUpdate from './updater';
 import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 import {SELECT_DATE_SLOT} from '../testIDs';
 
-
 //Fallback when RN version is < 0.44
 const {View, ViewPropTypes} = ReactNative;
 const viewPropTypes = ViewPropTypes || View.propTypes;
@@ -33,6 +32,7 @@ class Calendar extends Component {
   static propTypes = {
     /** Specify theme properties to override specific styles for calendar parts. Default = {} */
     theme: PropTypes.object,
+    fillerGapsColor: PropTypes.string,
     /** Collection of dates that have to be marked. Default = {} */
     markedDates: PropTypes.object,
     /** Specify style for calendar container element. Default = {} */
@@ -86,7 +86,11 @@ class Calendar extends Component {
     /** Disable right arrow. Default = false */
     disableArrowRight: PropTypes.bool,
     /** Style passed to the header */
-    headerStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.array]),
+    headerStyle: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.number,
+      PropTypes.array,
+    ]),
     /** Provide aria-level for calendar heading for proper accessibility when used with web (react-native-web) */
     webAriaLevel: PropTypes.number,
     /** Apply custom disable color to selected day indexes */
@@ -96,11 +100,12 @@ class Calendar extends Component {
     /** Replace default month and year title with custom one. the function receive a date as parameter. */
     renderHeader: PropTypes.any,
     /** Enable the option to swipe between months. Default: false */
-    enableSwipeMonths: PropTypes.bool
+    enableSwipeMonths: PropTypes.bool,
   };
 
   static defaultProps = {
-    enableSwipeMonths: false
+    enableSwipeMonths: false,
+    fillerGapsColor: '#FBEDED',
   };
 
   constructor(props) {
@@ -108,7 +113,7 @@ class Calendar extends Component {
 
     this.style = styleConstructor(this.props.theme);
     this.state = {
-      currentMonth: props.current ? parseDate(props.current) : XDate()
+      currentMonth: props.current ? parseDate(props.current) : XDate(),
     };
 
     this.updateMonth = this.updateMonth.bind(this);
@@ -118,30 +123,40 @@ class Calendar extends Component {
   }
 
   updateMonth(day, doNotTriggerListeners) {
-    if (day.toString('yyyy MM') === this.state.currentMonth.toString('yyyy MM')) {
+    if (
+      day.toString('yyyy MM') === this.state.currentMonth.toString('yyyy MM')
+    ) {
       return;
     }
-    this.setState({
-      currentMonth: day.clone()
-    }, () => {
-      if (!doNotTriggerListeners) {
-        const currMont = this.state.currentMonth.clone();
-        if (this.props.onMonthChange) {
-          this.props.onMonthChange(xdateToData(currMont));
+    this.setState(
+      {
+        currentMonth: day.clone(),
+      },
+      () => {
+        if (!doNotTriggerListeners) {
+          const currMont = this.state.currentMonth.clone();
+          if (this.props.onMonthChange) {
+            this.props.onMonthChange(xdateToData(currMont));
+          }
+          if (this.props.onVisibleMonthsChange) {
+            this.props.onVisibleMonthsChange([xdateToData(currMont)]);
+          }
         }
-        if (this.props.onVisibleMonthsChange) {
-          this.props.onVisibleMonthsChange([xdateToData(currMont)]);
-        }
-      }
-    });
+      },
+    );
   }
 
   _handleDayInteraction(date, interaction) {
     const day = parseDate(date);
     const minDate = parseDate(this.props.minDate);
     const maxDate = parseDate(this.props.maxDate);
-    if (!(minDate && !dateutils.isGTE(day, minDate)) && !(maxDate && !dateutils.isLTE(day, maxDate))) {
-      const shouldUpdateMonth = this.props.disableMonthChange === undefined || !this.props.disableMonthChange;
+    if (
+      !(minDate && !dateutils.isGTE(day, minDate)) &&
+      !(maxDate && !dateutils.isLTE(day, maxDate))
+    ) {
+      const shouldUpdateMonth =
+        this.props.disableMonthChange === undefined ||
+        !this.props.disableMonthChange;
       if (shouldUpdateMonth) {
         this.updateMonth(day);
       }
@@ -161,25 +176,32 @@ class Calendar extends Component {
 
   addMonth = (count) => {
     this.updateMonth(this.state.currentMonth.clone().addMonths(count, true));
-  }
+  };
 
   isDateNotInTheRange = (minDate, maxDate, date) => {
-    return (minDate && !dateutils.isGTE(date, minDate)) || (maxDate && !dateutils.isLTE(date, maxDate));
-  }
+    return (
+      (minDate && !dateutils.isGTE(date, minDate)) ||
+      (maxDate && !dateutils.isLTE(date, maxDate))
+    );
+  };
 
   getAccessibilityLabel = (state, day) => {
     const today = XDate.locales[XDate.defaultLocale].today;
-    const formatAccessibilityLabel = XDate.locales[XDate.defaultLocale].formatAccessibilityLabel;
+    const formatAccessibilityLabel =
+      XDate.locales[XDate.defaultLocale].formatAccessibilityLabel;
     const isToday = state === 'today';
     const markingLabel = this.getDateMarking(day);
 
     if (formatAccessibilityLabel) {
-      return `${isToday ? today : ''} ${day.toString(formatAccessibilityLabel)} ${markingLabel}`;
+      return `${isToday ? today : ''} ${day.toString(
+        formatAccessibilityLabel,
+      )} ${markingLabel}`;
     }
 
-    return `${isToday ? 'today' : ''} ${day.toString('dddd d MMMM yyyy')} ${markingLabel}`;
-  }
-
+    return `${isToday ? 'today' : ''} ${day.toString(
+      'dddd d MMMM yyyy',
+    )} ${markingLabel}`;
+  };
 
   renderDay(day, id) {
     const minDate = parseDate(this.props.minDate);
@@ -195,8 +217,11 @@ class Calendar extends Component {
       state = 'today';
     }
 
-    if (!dateutils.sameMonth(day, this.state.currentMonth) && this.props.hideExtraDays) {
-      return (<View key={id} style={{flex: 1}}/>);
+    if (
+      !dateutils.sameMonth(day, this.state.currentMonth) &&
+      this.props.hideExtraDays
+    ) {
+      return <View key={id} style={{flex: 1}} />;
     }
 
     const DayComp = this.getDayComponent();
@@ -210,13 +235,15 @@ class Calendar extends Component {
           testID={`${SELECT_DATE_SLOT}-${dateAsObject.dateString}`}
           state={state}
           theme={this.props.theme}
+          fillerGapsColor={this.props.fillerGapsColor}
           onPress={this.pressDay}
           onLongPress={this.longPressDay}
           date={dateAsObject}
           marking={this.getDateMarking(day)}
           accessibilityLabel={accessibilityLabel}
-          disableAllTouchEventsForDisabledDays={this.props.disableAllTouchEventsForDisabledDays}
-        >
+          disableAllTouchEventsForDisabledDays={
+            this.props.disableAllTouchEventsForDisabledDays
+          }>
           {date}
         </DayComp>
       </View>
@@ -258,16 +285,16 @@ class Calendar extends Component {
     }
 
     switch (this.props.markingType) {
-    case 'period':
-      return UnitDay;
-    case 'multi-dot':
-      return MultiDotDay;
-    case 'multi-period':
-      return MultiPeriodDay;
-    case 'custom':
-      return SingleDay;
-    default:
-      return Day;
+      case 'period':
+        return UnitDay;
+      case 'multi-dot':
+        return MultiDotDay;
+      case 'multi-period':
+        return MultiPeriodDay;
+      case 'custom':
+        return SingleDay;
+      default:
+        return Day;
     }
   }
 
@@ -276,7 +303,8 @@ class Calendar extends Component {
       return false;
     }
 
-    const dates = this.props.markedDates[day.toString('yyyy-MM-dd')] || EmptyArray;
+    const dates =
+      this.props.markedDates[day.toString('yyyy-MM-dd')] || EmptyArray;
     if (dates.length || dates) {
       return dates;
     } else {
@@ -292,35 +320,37 @@ class Calendar extends Component {
 
     const {SWIPE_UP, SWIPE_DOWN, SWIPE_LEFT, SWIPE_RIGHT} = swipeDirections;
     switch (gestureName) {
-    case SWIPE_UP:
-    case SWIPE_DOWN:
-      break;
-    case SWIPE_LEFT:
-      this.onSwipeLeft();
-      break;
-    case SWIPE_RIGHT:
-      this.onSwipeRight();
-      break;
+      case SWIPE_UP:
+      case SWIPE_DOWN:
+        break;
+      case SWIPE_LEFT:
+        this.onSwipeLeft();
+        break;
+      case SWIPE_RIGHT:
+        this.onSwipeRight();
+        break;
     }
-  }
+  };
 
   onSwipeLeft = () => {
     this.header.onPressRight();
-  }
+  };
 
   onSwipeRight = () => {
     this.header.onPressLeft();
-  }
+  };
 
   renderWeekNumber(weekNumber) {
     return (
-      <View style={{flex: 1, alignItems: 'center'}} key={`week-container-${weekNumber}`}>
+      <View
+        style={{flex: 1, alignItems: 'center'}}
+        key={`week-container-${weekNumber}`}>
         <Day
           key={`week-${weekNumber}`}
           theme={this.props.theme}
+          fillerGapsColor={this.props.fillerGapsColor}
           marking={{disableTouchEvent: true}}
-          state='disabled'
-        >
+          state="disabled">
           {weekNumber}
         </Day>
       </View>
@@ -337,7 +367,11 @@ class Calendar extends Component {
       week.unshift(this.renderWeekNumber(days[days.length - 1].getWeek()));
     }
 
-    return (<View style={this.style.week} key={id}>{week}</View>);
+    return (
+      <View style={this.style.week} key={id}>
+        {week}
+      </View>
+    );
   }
 
   render() {
@@ -354,9 +388,16 @@ class Calendar extends Component {
     let indicator;
     const current = parseDate(this.props.current);
     if (current) {
-      const lastMonthOfDay = current.clone().addMonths(1, true).setDate(1).addDays(-1).toString('yyyy-MM-dd');
-      if (this.props.displayLoadingIndicator &&
-        !(this.props.markedDates && this.props.markedDates[lastMonthOfDay])) {
+      const lastMonthOfDay = current
+        .clone()
+        .addMonths(1, true)
+        .setDate(1)
+        .addDays(-1)
+        .toString('yyyy-MM-dd');
+      if (
+        this.props.displayLoadingIndicator &&
+        !(this.props.markedDates && this.props.markedDates[lastMonthOfDay])
+      ) {
         indicator = true;
       }
     }
@@ -364,11 +405,10 @@ class Calendar extends Component {
       paddingRight: 0,
       paddingLeft: 0,
       paddingTop: 0,
-    }
+    };
     return (
       <GestureRecognizer
-        onSwipe={(direction, state) => this.onSwipe(direction, state)}
-      >
+        onSwipe={(direction, state) => this.onSwipe(direction, state)}>
         <View
           style={[this.style.container, this.props.style, containerStyle]}
           accessibilityElementsHidden={this.props.accessibilityElementsHidden} // iOS
@@ -376,7 +416,7 @@ class Calendar extends Component {
         >
           <CalendarHeader
             testID={this.props.testID}
-            ref={c => this.header = c}
+            ref={(c) => (this.header = c)}
             style={this.props.headerStyle}
             theme={this.props.theme}
             hideArrows={this.props.hideArrows}
